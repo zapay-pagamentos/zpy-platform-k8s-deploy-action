@@ -51,7 +51,7 @@ runs:
     ## Fazendo deploy da application no kubernetes
     - name: Deploy to k8s
       env:
-        IMAGE_CREATED_REPO: ${{ inputs.ecr-repo }}
+        IMAGE_CREATED_REPO: ${{ inputs.ecr-repository }}
         IMAGE_CREATED_TAG: ${{ inputs.image-tag }}
         CLUSTER_REGION: ${{ inputs.cluster-region }}
         CLUSTER_NAME: ${{ inputs.cluster-name }}
