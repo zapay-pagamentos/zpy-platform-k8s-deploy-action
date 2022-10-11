@@ -58,6 +58,7 @@ runs:
         CLUSTER_NAMESPACE: ${{ inputs.cluster-namespace }}
         NEW_RELIC_LICENSE_KEY: ${{ inputs.new-relic-license-key }}
         HELM_CHART_NAME: ${{ inputs.helm-chart-name }}
+      shell: bash
       run: |
         aws eks update-kubeconfig --region $CLUSTER_REGION --name $CLUSTER_NAME
         kubectl config set-context --current --namespace=$CLUSTER_NAMESPACE
