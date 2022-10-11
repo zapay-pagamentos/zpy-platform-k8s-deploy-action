@@ -1,0 +1,69 @@
+name: 'Deploy Application'
+description: 'Deploy application in k8s'
+inputs:
+  aws-access-key-id:  # id of input
+    description: 'AWS access key'
+    required: true
+  aws-secret-access-key:  # id of input
+    description: 'AWS secret key'
+    required: true
+  aws-region:  # id of input
+    description: 'AWS region'
+    required: true
+  ecr-repo:  # id of input
+    description: 'ECR repository'
+    required: true
+  image-tag:  # id of input
+    description: 'Image TAG'
+    required: true
+  cluster-region:  # id of input
+    description: 'Cluster k8s region'
+    required: true
+  cluster-name:  # id of input
+    description: 'Cluster k8s name'
+    required: true
+  cluster-namespace:  # id of input
+    description: 'Cluster k8s namespace'
+    required: true
+  new-relic-license-key:  # id of input
+    description: 'New Relic license key'
+    required: true
+  helm-chart-name:  # id of input
+    description: 'Chart name'
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+    ## Clone do código
+    - name: Check out code
+      uses: actions/checkout@v2
+    
+    ## Configurando as credenciais AWS
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ inputs.aws-access-key-id }}
+        aws-secret-access-key: ${{ inputs.aws-secret-access-key }}
+        aws-region: ${{ inputs.aws-region }}
+        mask-aws-account-id: 'no'
+    
+    ## Fazendo deploy da application no kubernetes
+    - name: Deploy to k8s
+      env:
+        IMAGE_CREATED_REPO: ${{ inputs.ecr-repo }}
+        IMAGE_CREATED_TAG: ${{ inputs.image-tag }}
+        CLUSTER_REGION: ${{ inputs.cluster-region }}
+        CLUSTER_NAME: ${{ inputs.cluster-name }}
+        CLUSTER_NAMESPACE: ${{ inputs.cluster-namespace }}
+        NEW_RELIC_LICENSE_KEY: ${{ inputs.new-relic-license-key }}
+        HELM_CHART_NAME: ${{ inputs.helm-chart-name }}
+      run: |
+        aws eks update-kubeconfig --region $CLUSTER_REGION --name $CLUSTER_NAME
+        kubectl config set-context --current --namespace=$CLUSTER_NAMESPACE
+        kubectl delete secret newrelic-license-key --ignore-not-found
+        kubectl create secret generic newrelic-license-key --from-literal=NEW_RELIC_LICENSE_KEY=$NEW_RELIC_LICENSE_KEY
+        envsubst < ./helm-deploy/values.yaml | tee ./helm-deploy/values.yaml
+        aws ecr get-login-password --region $CLUSTER_REGION | helm registry login --username AWS --password-stdin 071032557399.dkr.ecr.sa-east-1.amazonaws.com
+        helm dependency build ./helm-deploy
+        helm upgrade --install $HELM_CHART_NAME ./helm-deploy -n $CLUSTER_NAMESPACE
