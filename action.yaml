@@ -28,8 +28,11 @@ inputs:
   new-relic-license-key:  # id of input
     description: 'New Relic license key'
     required: true
-  helm-chart-name:  # id of input
+  application-name:  # id of input
     description: 'Chart name'
+    required: true
+  environment:  # id of input
+    description: 'Environment'
     required: true
 
 runs:
@@ -51,20 +54,24 @@ runs:
     ## Fazendo deploy da application no kubernetes
     - name: Deploy to k8s
       env:
+        DOPPLER_TOKEN: ${{ inputs.doppler-token }}
         IMAGE_CREATED_REPO: ${{ inputs.ecr-repository }}
         IMAGE_CREATED_TAG: ${{ inputs.image-tag }}
         CLUSTER_REGION: ${{ inputs.cluster-region }}
         CLUSTER_NAME: ${{ inputs.cluster-name }}
         CLUSTER_NAMESPACE: ${{ inputs.cluster-namespace }}
         NEW_RELIC_LICENSE_KEY: ${{ inputs.new-relic-license-key }}
-        HELM_CHART_NAME: ${{ inputs.helm-chart-name }}
+        APPLICATION_NAME: ${{ inputs.application-name }}
+        ENVIRONMENT: ${{ inputs.environment }}
       shell: bash
       run: |
         aws eks update-kubeconfig --region $CLUSTER_REGION --name $CLUSTER_NAME
         kubectl config set-context --current --namespace=$CLUSTER_NAMESPACE
         kubectl delete secret newrelic-license-key --ignore-not-found
         kubectl create secret generic newrelic-license-key --from-literal=NEW_RELIC_LICENSE_KEY=$NEW_RELIC_LICENSE_KEY
-        envsubst < ./helm-deploy/values.yaml | tee ./helm-deploy/values.yaml
+        kubectl delete secret $APPLICATION_NAME --ignore-not-found
+        kubectl create secret generic $APPLICATION_NAME --from-env-file <(doppler secrets download --no-file --format docker)
+        envsubst < ./.github/helm-deployments/$ENVIRONMENT/values.yaml | tee ./.github/helm-deployments/$ENVIRONMENT/values.yaml
         aws ecr get-login-password --region $CLUSTER_REGION | helm registry login --username AWS --password-stdin 071032557399.dkr.ecr.sa-east-1.amazonaws.com
-        helm dependency build ./helm-deploy
-        helm upgrade --install $HELM_CHART_NAME ./helm-deploy -n $CLUSTER_NAMESPACE
+        helm dependency build ./.github/helm-deployments/$ENVIRONMENT
+        helm upgrade --install $APPLICATION_NAME ./.github/helm-deployments/$ENVIRONMENT -n $CLUSTER_NAMESPACE
