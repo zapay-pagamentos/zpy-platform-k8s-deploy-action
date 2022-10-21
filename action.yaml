@@ -16,9 +16,6 @@ inputs:
   image-tag:  # id of input
     description: 'Image TAG'
     required: true
-  cluster-region:  # id of input
-    description: 'Cluster k8s region'
-    required: true
   cluster-name:  # id of input
     description: 'Cluster k8s name'
     required: true
@@ -33,6 +30,9 @@ inputs:
     required: true
   environment:  # id of input
     description: 'Environment'
+    required: true
+  doppler-token:  # id of input
+    description: 'Doppler token'
     required: true
 
 runs:
@@ -57,7 +57,7 @@ runs:
         DOPPLER_TOKEN: ${{ inputs.doppler-token }}
         IMAGE_CREATED_REPO: ${{ inputs.ecr-repository }}
         IMAGE_CREATED_TAG: ${{ inputs.image-tag }}
-        CLUSTER_REGION: ${{ inputs.cluster-region }}
+        CLUSTER_REGION: ${{ inputs.aws-region }}
         CLUSTER_NAME: ${{ inputs.cluster-name }}
         CLUSTER_NAMESPACE: ${{ inputs.cluster-namespace }}
         NEW_RELIC_LICENSE_KEY: ${{ inputs.new-relic-license-key }}
