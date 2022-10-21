@@ -75,4 +75,4 @@ runs:
         envsubst < ./.github/helm-deploy/$ENVIRONMENT/values.yaml | tee ./.github/helm-deploy/$ENVIRONMENT/values.yaml
         aws ecr get-login-password --region $CLUSTER_REGION | helm registry login --username AWS --password-stdin 071032557399.dkr.ecr.sa-east-1.amazonaws.com
         helm dependency build ./.github/helm-deploy/$ENVIRONMENT
-        helm upgrade --install $APPLICATION_NAME ./.github/helm-deploy/$ENVIRONMENT -n $CLUSTER_NAMESPACE
+        helm upgrade --install $APPLICATION_NAME ./.github/helm-deploy/$ENVIRONMENT
