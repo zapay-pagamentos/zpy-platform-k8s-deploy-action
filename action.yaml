@@ -72,7 +72,7 @@ runs:
         kubectl create secret generic newrelic-license-key --from-literal=NEW_RELIC_LICENSE_KEY=$NEW_RELIC_LICENSE_KEY
         kubectl delete secret $APPLICATION_NAME --ignore-not-found
         kubectl create secret generic $APPLICATION_NAME --from-env-file <(doppler secrets download --no-file --format docker)
-        envsubst < ./.github/helm-deployments/$ENVIRONMENT/values.yaml | tee ./.github/helm-deployments/$ENVIRONMENT/values.yaml
+        envsubst < ./.github/helm-deploy/$ENVIRONMENT/values.yaml | tee ./.github/helm-deploy/$ENVIRONMENT/values.yaml
         aws ecr get-login-password --region $CLUSTER_REGION | helm registry login --username AWS --password-stdin 071032557399.dkr.ecr.sa-east-1.amazonaws.com
-        helm dependency build ./.github/helm-deployments/$ENVIRONMENT
-        helm upgrade --install $APPLICATION_NAME ./.github/helm-deployments/$ENVIRONMENT -n $CLUSTER_NAMESPACE
+        helm dependency build ./.github/helm-deploy/$ENVIRONMENT
+        helm upgrade --install $APPLICATION_NAME ./.github/helm-deploy/$ENVIRONMENT -n $CLUSTER_NAMESPACE
