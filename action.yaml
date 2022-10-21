@@ -66,6 +66,7 @@ runs:
       shell: bash
       run: |
         aws eks update-kubeconfig --region $CLUSTER_REGION --name $CLUSTER_NAME
+        kubectl get ns $CLUSTER_NAMESPACE || kubectl create ns $CLUSTER_NAMESPACE
         kubectl config set-context --current --namespace=$CLUSTER_NAMESPACE
         kubectl delete secret newrelic-license-key --ignore-not-found
         kubectl create secret generic newrelic-license-key --from-literal=NEW_RELIC_LICENSE_KEY=$NEW_RELIC_LICENSE_KEY
