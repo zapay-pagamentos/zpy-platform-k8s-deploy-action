@@ -71,7 +71,7 @@ runs:
         kubectl delete secret newrelic-license-key --ignore-not-found
         kubectl create secret generic newrelic-license-key --from-literal=NEW_RELIC_LICENSE_KEY=$NEW_RELIC_LICENSE_KEY
         kubectl delete secret $APPLICATION_NAME-doppler-token --ignore-not-found
-        kubectl create secret generic $APPLICATION_NAME-doppler-token --from-literal=$DOPPLER_TOKEN
+        kubectl create secret generic $APPLICATION_NAME-doppler-token --from-literal=DOPPLER_TOKEN=$DOPPLER_TOKEN
         kubectl delete secret $APPLICATION_NAME --ignore-not-found
         kubectl create secret generic $APPLICATION_NAME --from-env-file <(doppler secrets download --no-file --format docker)
         envsubst < ./.github/helm-deploy/$ENVIRONMENT/values.yaml | tee ./.github/helm-deploy/$ENVIRONMENT/values.yaml
