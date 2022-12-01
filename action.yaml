@@ -34,6 +34,9 @@ inputs:
   doppler-token:  # id of input
     description: 'Doppler token'
     required: true
+  state:  # id of input
+    description: 'Detran microservices state'
+    required: true
 
 runs:
   using: "composite"
@@ -63,6 +66,7 @@ runs:
         NEW_RELIC_LICENSE_KEY: ${{ inputs.new-relic-license-key }}
         APPLICATION_NAME: ${{ inputs.application-name }}
         ENVIRONMENT: ${{ inputs.environment }}
+        STATE: ${{ inputs.state }}
       shell: bash
       run: |
         aws eks update-kubeconfig --region $CLUSTER_REGION --name $CLUSTER_NAME
