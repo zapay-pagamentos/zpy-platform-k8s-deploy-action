@@ -34,6 +34,10 @@ inputs:
   doppler-token:  # id of input
     description: 'Doppler token'
     required: true
+  helm-timeout:  # id of input
+    description: 'Helm timeout value parameter'
+    required: false
+    default: '300s'
 
 runs:
   using: "composite"
@@ -77,4 +81,4 @@ runs:
         envsubst < ./.github/helm-deploy/$ENVIRONMENT/values.yaml | tee ./.github/helm-deploy/$ENVIRONMENT/values.yaml
         aws ecr get-login-password --region sa-east-1 | helm registry login --username AWS --password-stdin 071032557399.dkr.ecr.sa-east-1.amazonaws.com
         helm dependency build ./.github/helm-deploy/$ENVIRONMENT
-        helm upgrade --atomic --timeout 600s --debug --install $APPLICATION_NAME ./.github/helm-deploy/$ENVIRONMENT -n $CLUSTER_NAMESPACE
+        helm upgrade --atomic --timeout ${{ inputs.helm-timeout }} --debug --install $APPLICATION_NAME ./.github/helm-deploy/$ENVIRONMENT -n $CLUSTER_NAMESPACE
