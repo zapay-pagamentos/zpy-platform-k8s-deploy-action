@@ -45,7 +45,7 @@ inputs:
     description: 'True if delete secret newrelic-license-key to update value'
     required: false
     default: 'false'
-  values-name:
+  values-file:
     description: 'Name of values file'
     required: false
     default: 'values.yaml'
@@ -93,4 +93,4 @@ runs:
         envsubst < ./.github/helm-deploy/$ENVIRONMENT/values.yaml | tee ./.github/helm-deploy/$ENVIRONMENT/values.yaml
         aws ecr get-login-password --region sa-east-1 | helm registry login --username AWS --password-stdin 071032557399.dkr.ecr.sa-east-1.amazonaws.com
         helm dependency build ./.github/helm-deploy/$ENVIRONMENT
-        helm upgrade --atomic --timeout ${{ inputs.helm-timeout }} --debug --install $APPLICATION_NAME ./.github/helm-deploy/$ENVIRONMENT -f ./.github/helm-deploy/$ENVIRONMENT/${{ inputs.values-name }} -n $CLUSTER_NAMESPACE
+        helm upgrade --atomic --timeout ${{ inputs.helm-timeout }} --debug --install $APPLICATION_NAME ./.github/helm-deploy/$ENVIRONMENT -f ./.github/helm-deploy/$ENVIRONMENT/${{ inputs.values-file }} -n $CLUSTER_NAMESPACE
