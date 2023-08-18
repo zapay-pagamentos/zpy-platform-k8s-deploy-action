@@ -87,7 +87,7 @@ runs:
     - name: New Relic Deployment Marker
       uses: newrelic/deployment-marker-action@v2.3.0
       with:
-        apiKey: ${{ inputs.new-relic-license-key }}
+        apiKey: ${{ inputs.apiKey }}
         guid: ${{ inputs.new_relic_deployment_entity_guid }}
         version: "${{ inputs.image-tag }}"
         user: "${{ github.actor }}"
