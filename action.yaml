@@ -82,3 +82,14 @@ runs:
         aws ecr get-login-password --region sa-east-1 | helm registry login --username AWS --password-stdin 071032557399.dkr.ecr.sa-east-1.amazonaws.com
         helm dependency build ./.github/helm-deploy/$ENVIRONMENT
         helm upgrade --atomic --timeout ${{ inputs.helm-timeout }} --debug --install $APPLICATION_NAME ./.github/helm-deploy/$ENVIRONMENT -n $CLUSTER_NAMESPACE
+    
+    # Config new relic deployment marker
+    - name: New Relic Deployment Marker
+      uses: newrelic/deployment-marker-action@v2.3.0
+      with:
+        apiKey: ${{ secrets.NEW_RELIC_API_KEY }}
+        guid: ${{ secrets.NEW_RELIC_DEPLOYMENT_ENTITY_GUID }}
+        version: "${{ inputs.image-tag }}"
+        user: "${{ github.actor }}"
+        commit: "${{ github.sha }}"
+        description: "Automated Release via Github Actions"
