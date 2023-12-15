@@ -10,7 +10,7 @@ inputs:
   aws-region:  # id of input
     description: 'AWS region'
     required: true
-  ecr-repo:  # id of input
+  ecr-repository:  # id of input
     description: 'ECR repository'
     required: true
   image-tag:  # id of input
