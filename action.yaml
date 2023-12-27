@@ -37,7 +37,7 @@ inputs:
   helm-timeout:  # id of input
     description: 'Helm timeout value parameter'
     required: false
-    default: '600s'
+    default: '900s'
   state:  # id of input
     description: 'Detran microservices state'
     required: true
