@@ -22,17 +22,11 @@ inputs:
   cluster-namespace:  # id of input
     description: 'Cluster k8s namespace'
     required: true
-  new-relic-license-key:  # id of input
-    description: 'New Relic license key'
-    required: true
   application-name:  # id of input
     description: 'Chart name'
     required: true
   environment:  # id of input
     description: 'Environment'
-    required: true
-  doppler-token:  # id of input
-    description: 'Doppler token'
     required: true
   helm-timeout:  # id of input
     description: 'Helm timeout value parameter'
@@ -58,13 +52,11 @@ runs:
     ## Fazendo deploy da application no kubernetes
     - name: Deploy to k8s
       env:
-        DOPPLER_TOKEN: ${{ inputs.doppler-token }}
         IMAGE_CREATED_REPO: ${{ inputs.ecr-repository }}
         IMAGE_CREATED_TAG: ${{ inputs.image-tag }}
         CLUSTER_REGION: ${{ inputs.aws-region }}
         CLUSTER_NAME: ${{ inputs.cluster-name }}
         CLUSTER_NAMESPACE: ${{ inputs.cluster-namespace }}
-        NEW_RELIC_LICENSE_KEY: ${{ inputs.new-relic-license-key }}
         APPLICATION_NAME: ${{ inputs.application-name }}
         ENVIRONMENT: ${{ inputs.environment }}
       shell: bash
@@ -72,12 +64,6 @@ runs:
         aws eks update-kubeconfig --region $CLUSTER_REGION --name $CLUSTER_NAME
         kubectl get ns $CLUSTER_NAMESPACE || (echo "NAMESPACE INVÁLIDO"; exit 1)
         kubectl config set-context --current --namespace=$CLUSTER_NAMESPACE
-        kubectl delete secret newrelic-license-key --ignore-not-found
-        kubectl create secret generic newrelic-license-key --from-literal=NEW_RELIC_LICENSE_KEY=$NEW_RELIC_LICENSE_KEY
-        kubectl delete secret $APPLICATION_NAME-doppler-token --ignore-not-found
-        kubectl create secret generic $APPLICATION_NAME-doppler-token --from-literal=DOPPLER_TOKEN=$DOPPLER_TOKEN
-        kubectl delete secret $APPLICATION_NAME --ignore-not-found
-        kubectl create secret generic $APPLICATION_NAME --from-env-file <(doppler secrets download --no-file --format docker)
         envsubst < ./.github/helm-deploy/$ENVIRONMENT/values.yaml | tee ./.github/helm-deploy/$ENVIRONMENT/values.yaml
         aws ecr get-login-password --region sa-east-1 | helm registry login --username AWS --password-stdin 071032557399.dkr.ecr.sa-east-1.amazonaws.com
         helm dependency build ./.github/helm-deploy/$ENVIRONMENT
