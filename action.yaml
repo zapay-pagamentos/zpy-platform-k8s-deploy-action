@@ -67,7 +67,6 @@ runs:
         NEW_RELIC_LICENSE_KEY: ${{ inputs.new-relic-license-key }}
         APPLICATION_NAME: ${{ inputs.application-name }}
         ENVIRONMENT: ${{ inputs.environment }}
-        AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
       shell: bash
       run: |
         aws eks update-kubeconfig --region $CLUSTER_REGION --name $CLUSTER_NAME
